@@ -43,12 +43,10 @@ jar_util()
 				for fld in $(find -maxdepth 1 -name "*.out" ); do
 					if [[ $4 ]]; then
 						if [[ ! "$fld" == *"$4"* ]]; then
-							echo $fld 
 							$sma $fld -o $(echo ${fld//.out})
 							[[ -f $(echo ${fld//.out}) ]] && rm -rf $fld
 						fi
 					else 
-						echo $fld 
 						$sma $fld -o $(echo ${fld//.out})
 						[[ -f $(echo ${fld//.out}) ]] && rm -rf $fld	
 					fi
@@ -59,7 +57,7 @@ jar_util()
 				if [[ -f $dir/jar_temp/$2 ]]; then
 					sudo cp -rf $dir/jar_temp/$2 $dir/module/system/framework
 					final_dir="$dir/module/*"
-					7za a -tzip "$dir/services_patched_$(date "+%d%m%y").zip" $final_dir
+					#7za a -tzip "$dir/services_patched_$(date "+%d%m%y").zip" $final_dir
 					echo "Success"
 					rm -rf $dir/jar_temp/$2.out $dir/jar_temp/$2_notal 
 				else
