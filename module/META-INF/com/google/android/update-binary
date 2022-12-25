@@ -1,0 +1,343 @@
+#!/sbin/sh
+# Kopi Installer V1.1
+# Since 08-05-2020
+# Latest Update 17-03-2021
+# by wahyu6070 (dont change)
+
+OUTFD=/proc/self/fd/$2;
+ZIPFILE="$3";
+
+ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false;
+$BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMODE=true;
+$BOOTMODE && OUTFD=/proc/self/fd/0;
+########################################
+# Util Functions
+########################################
+
+ui_print() { $BOOTMODE && echo "$1" || echo -e "ui_print $1\nui_print" >> $OUTFD; }
+show_progress() { echo "progress $1 $2" > $OUTFD; }
+set_progress() { echo "set_progress $1" > $OUTFD; }
+
+#Kopi functions
+print(){ $BOOTMODE && echo "$1" || echo -e "ui_print $1\nui_print" >> $OUTFD; }
+getp(){ grep "^$1" "$2" | head -n1 | cut -d = -f 2; }
+del(){ rm -rf "$@"; }
+delete(){ rm -rf "$@"; }
+cdir(){ mkdir -p "$@"; }
+abort(){ print "$1"; exit 1; }
+
+#
+printlog(){
+	print "$1"
+	if [ "$1" != " " ]; then
+	echo "$1 [$(date '+%d/%m/%Y %H:%M:%S')]" >> $log
+	echo "$1 [$(date '+%d/%m/%Y %H:%M:%S')]" >> $loglive
+	else
+	print "$1" >> $log
+	echo "$1" >> $loglive
+	fi
+	}
+sedlog(){
+	echo "[Processing]  $1 [$(date '+%d/%m/%Y %H:%M:%S')]" >> $log
+	echo "[Processing]  $1 [$(date '+%d/%m/%Y %H:%M:%S')]" >> $loglive
+	}
+#
+while_log(){
+	echo "$1" | tee -a $log
+	}
+listlog(){
+	echo " " >> $log
+	echo "---------- Folder List : $1 ----------" >> $log
+	echo " " >> $loglive
+	echo "---------- Folder List : $1 ----------" >> $loglive
+	find "$1" -type f | while read lol; do
+	while_log "| $(du -sah $lol | cut -f 1) | $lol"
+	done >> $loglive
+	echo "--------------------------------------" >> $log
+	echo " " >> $log
+	echo "--------------------------------------" >> $loglive
+	echo " " >> $loglive
+	}
+
+loadings() {
+  PID=$!
+  a=0;
+  while [ -d /proc/$PID ]; do
+    b=$((+1))
+    a=$((a+1))
+    sleep 0.9s
+    printf "\r${@} [${a}Second]"
+  done
+}
+
+loadingm() {
+  PID=$!
+  a=0
+  while [ -d /proc/$PID ]; do
+    b=$((a+1))
+    a=$((h+1))
+    sleep 59.9s
+    printf "\r${@} [${b}Minutes]"
+  done
+}
+
+loadingz() {
+  PID=$!
+  a=0
+  while [ -d /proc/$PID ]; do
+    b=$((a+1))
+    a=$((a+1))
+    sleep 0.9s
+    printf "#"
+  done
+}
+
+printmid() {
+  local CHAR=$(printf "$@" | sed 's|\\e[[0-9;]*m||g' | wc -m)
+  local hfCOLUMN=$((COLUMNS/2))
+  local hfCHAR=$((CHAR/2))
+  local indent=$((hfCOLUMN-hfCHAR))
+  echo "$(printf '%*s' "${indent}" '') $@"
+}
+
+setime(){
+	if [[ $1 == '-f' ]] && [ "$2" ] && [ $3 -eq $3 ]; then
+	   if [ -f "$2" ]; then
+	      touch -ct $3 "$2" 2>/dev/null || echo "setime: bad '$3': Value too large for defined data type"
+	   else
+	      echo "setime: $2: Is not file"
+	   fi
+	elif [[ $1 == '-r' ]] && [ "$2" ] && [ $3 -eq $3 ]; then
+	   if [ -d "$2" ]; then
+	      find "$2" -print | while read filename; do
+	      touch -ct $3 "$filename" 2>/dev/null || echo "setime: bad '$3': Value too large for defined data type"
+	      done
+	   else
+	      echo "setime: $2: Is not directory"
+	   fi
+	elif [[ $1 == '--version' ]] || [[ $1 == '-v' ]]; then
+	echo "setime v1.0 Copyright (C) 2020 wahyu kurniawan (wahyu6070)."
+    elif [[ $1 == '--help' ]] || [[ $1 == '-h' ]]; then
+    echo "usage : setime <options> <input> <datetime>"
+    echo " "
+    echo "example : setime -r /sdcard/download 202004081503"
+    echo " "
+    echo "options"
+    echo "-f                    file"
+    echo "-r                    change all directory and file"
+    echo "-v, --version         version"
+    echo "-h, --help            help"
+    echo " "
+    echo "setime v1.0 since 2020-04-09 Copyright (C) 2020 wahyu kurniawan (wahyu6070)."
+    else
+    echo "usage : setime --help"
+    fi
+}
+
+set_prop() {
+  property="$1"
+  value="$2"
+  file_location="$3"
+  if grep -q "${property}" "${file_location}"; then
+    sed -i "s/\(${property}\)=.*/\1=${value}/g" "${file_location}"
+  else
+    echo "${property}=${value}" >>"${file_location}"
+  fi
+}
+########################################
+#    Kopi Script
+########################################
+	
+#(dont change)
+#print " ";
+#print "- Kopi Installer by wahyu6070";
+print " "
+show_progress 1.34 0;
+
+#mount
+print "- Mounting"
+active_slot=`getprop ro.boot.slot_suffix`
+if [ ! -z "$active_slot" ]; then
+  device_abpartition=true
+  if [ -n "$(cat /etc/fstab | grep /system_root)" ];
+  then
+    MOUNT_POINT=/system_root
+  else
+    MOUNT_POINT=/system
+  fi
+elif [ -n "$(cat /etc/fstab | grep /system_root)" ];
+then
+  device_abpartition=false
+  MOUNT_POINT=/system_root
+else
+  device_abpartition=false
+  MOUNT_POINT=/system
+fi
+mount -o rw,remount $MOUNT_POINT || mount $MOUNT_POINT || mount -o rw,remount -t auto $MOUNT_POINT || mount -o rw,remount / || abort "- Abort mounting system"
+mount -o rw,remount /vendor || mount /vendor || mount -o rw,remount -t auto /vendor || mount -o rw,remount / || abort "- Abort mounting vendor"
+test -f /system/system/build.prop && root=/system/system;
+set_progress 0.4;
+
+#system dir
+if [ -f /system/system/build.prop ]; then
+system=/system/system
+elif [ -f /system_root/system/build.prop ]; then
+system=/system_root/system
+elif [ -f /system_root/build.prop ]; then
+system=/system_root
+else
+system=/system
+fi
+
+#Extract
+kopi=/dev/tmp/kopi
+MODPATH=$kopi
+TMPDIR=/dev/tmp
+cdir $kopi;
+cd $kopi
+print "- Extracting ZIP File"
+unzip -o "$ZIPFILE" >&2
+[ ! -f module.prop ] && abort "- Module.prop Not Found"
+
+#prop
+prop=$system/build.prop
+API=`getp ro.build.version.sdk $prop`
+ABI=`getp ro.product.cpu.abi $prop | cut -c-3`
+ABI2=`getp ro.product.cpu.abi2 $prop | cut -c-3`
+ABILONG=`getp ro.product.cpu.abi $prop`
+ARCH=arm
+ARCH32=arm
+IS64BIT=false
+if [ "$ABI" = "x86" ]; then ARCH=x86; ARCH32=x86; fi;
+if [ "$ABI2" = "x86" ]; then ARCH=x86; ARCH32=x86; fi;
+if [ "$ABILONG" = "arm64-v8a" ]; then ARCH=arm64; ARCH32=arm; IS64BIT=true; fi;
+if [ "$ABILONG" = "x86_64" ]; then ARCH=x64; ARCH32=x86; IS64BIT=true; fi;
+
+MODULE=./module.prop
+ID=`getp id $MODULE`
+NAME=`getp name $MODULE`
+VERSION=`getp version $MODULE`
+VERSIONCODE=`getp versioncode $MODULE`
+DEVICE=`getp device $MODULE`
+DATE=`getp date $MODULE`
+AUTHOR=`getp author $MODULE`
+KOPIMOD=/data/kopi/modules/"$ID"
+MAGISKMOD=/data/adb/modules/$ID
+set_progress 0.5;
+
+#req
+minsdk=`getp minsdk $MODULE`
+if [ $minsdk -eq $minsdk ] && [ $API -lt $minsdk ]; then
+abort "- Android version not support !"
+fi
+
+#Type install
+if [ $(getp typeinstall $MODULE) = kopi ]; then TYPEINSTALL=kopi
+elif [ $(getp typeinstall $MODULE) = magisk ]; then TYPEINSTALL=magisk
+elif [ $(getp typeinstall $MODULE) = false ]; then TYPEINSTALL=false
+else
+$BOOTMODE && TYPEINSTALL=magisk || [ -f /data/adb/magisk/magisk ] && TYPEINSTALL=magisk || TYPEINSTALL=kopi
+fi
+
+# Uninstall
+if [ -f $KOPIMOD/uninstall.sh ] && [ $(cat $KOPIMOD/typeinstall) = kopi ] && [ $(getp versioncode $KOPIMOD/module.prop) -eq $VERSIONCODE ]; then
+	print "- Uninstalling $NAME"
+	test -f $KOPIMOD/uninstall.sh && . $KOPIMOD/uninstall.sh || abort "- Uninstalling failed !"
+	del $KOPIMOD
+	uninstallmode=true
+else
+# Installing
+	cdir $KOPIMOD
+	[ -f uninstall.sh ] && cp -pf uninstall.sh $KOPIMOD && chmod 775 $KOPIMOD/uninstall.sh;
+	echo "$TYPEINSTALL" > $KOPIMOD/typeinstall
+	[ -f module.prop ] && cp -pf module.prop $KOPIMOD;
+	[ -d bin ] && chmod -R 775 $MODPATH/bin;
+	[ -f install.sh ] && chmod 775 install.sh && . ./install.sh;
+	[ -f customize.sh ] && chmod 0775 customize.sh && . ./customize.sh;
+	
+	case $TYPEINSTALL in
+	magisk)
+	print "- Type Magisk Module"
+	[ -f /data/adb/magisk/util_functions.sh ] && [ $TYPEINSTALL = magisk ] && . /data/adb/magisk/util_functions.sh
+	modup="/data/adb/modules_update/$ID"
+	del $modup
+	cdir "$modup"
+	cdir "/data/adb/modules/$ID"
+	touch "/data/adb/modules/$ID/update"
+	cp -pf $kopi/module.prop "/data/adb/modules/$ID/"
+	[ -f $kopi/magisk-uninstall.sh ] && cp -pf $kopi/magisk-uninstall.sh $modup/uninstall.sh && chmod 755 $modup/uninstall.sh
+	[ -f $kopi/magisk-system.prop ] && cp -pf $kopi/magisk-system.prop $modup/system.prop
+	[ -f $kopi/magisk-service.sh ] && cp -pf $kopi/magisk-service.sh $modup/service.sh && chmod 755 $modup/service.sh
+	[ -f $kopi/magisk-post-fs-data.sh ] && cp -pf $kopi/magisk-post-fs-data.sh $modup/post-fs-data.sh && chmod 755 $modup/post-fs-data.sh
+	cp -rdf $kopi/* "$modup"
+	del $modup/META-INF
+	del $modup/install.sh
+	del $modup/customize.sh
+	del $modup/install.zip
+	del $modup/README.md
+	;;
+	kopi)
+	print "- Type Kopi Module"
+	#Creating list file or dir installed log
+	if [ -d $MODPATH/system ] && [ "$(ls -A $MODPATH/system)" ]; then
+		cd $MODPATH/system
+		for make_perm_sys in $(find *); do
+			echo "$make_perm_sys" >> $KOPIMOD/list_install_system
+		done
+	fi
+
+	if [ -d $MODPATH/vendor ] && [ "$(ls -A $MODPATH/vendor)" ]; then
+		cd $MODPATH/vendor
+		for make_perm_ven in $(find *); do
+			echo "$make_perm_ven" >> $KOPIMOD/list_install_vendor
+		done
+	fi
+	
+	#cp /system/vendor
+	if [ -d $kopi/system/vendor ] && [ "$(ls -A $kopi/system/vendor)" ]; then
+		cdir $kopi/vendor
+		cp -rdf $kopi/system/vendor/* $kopi/vendor/;
+		del $kopi/system/vendor
+	elif [ -d $kopi/system/vendor ] && [ ! "$(ls -A $kopi/system/vendor)" ]; then
+		del $kopi/system/vendor
+	fi;
+	
+	#cp /system
+	if [ -d $kopi/system ] && [ "$(ls -A $kopi/system)" ]; then
+		print "- Pushing system";
+		cp -rdf $kopi/system/* $system/;
+	fi;
+	#cp vendor
+	if [ -d $kopi/vendor ] && [ "$(ls -A $kopi/vendor)" ]; then
+		print "- Pushing vendor"; 
+		cp -rdf $kopi/vendor/* /vendor/;
+	fi;
+	set_progress 8.1;
+	;;
+	false)
+		print "- Type install manual" ;;
+	*)
+		abort "- Type Install $TYPEINSTALL Not found"
+	;;
+	esac
+fi
+
+#permissions
+if [ -f $kopi/permissions.sh ] && [ ! $uninstallmode ]; then
+print "- Set Permissions"
+chmod 775 $kopi/permissions.sh
+. $kopi/permissions.sh
+fi
+
+#umount
+print "- Umounting";
+if [ $TYPEINSTALL = kopi ]; then
+umount /system
+umount /vendor
+fi
+set_progress 1.1;
+cd /;
+del $TMPDIR
+print "- Done";
+set_progress 0.3;
+exit 0;

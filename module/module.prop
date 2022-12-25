@@ -1,0 +1,6 @@
+id=services.jar_patch
+name=Patch APK protection in android 13
+version=1
+versionCode=1
+author=BHLNK
+description=Add credit @github-hienhien when share this module, thanks

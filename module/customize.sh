@@ -1,0 +1,17 @@
+print "╔══╗"
+print "╚╗╔╝"
+print "╔╝(¯`v´¯)"
+print "╚══`.¸.[MIUIVS MOD SIMPLE]"
+print "╲┏━┳━━━━━━━━┓╲╲ "
+print "╲┃◯┃╭┻┻╮╭┻┻╮┃╲╲ "
+print "╲┃╮┃┃╭╮┃┃╭╮┃┃╲╲"
+print "╲┃╯┃┗┻┻┛┗┻┻┻┻╮╲"
+print "╲┃◯┃╭╮╰╯┏━━━┳╯╲"
+print "╲┃╭┃╰┏┳┳┳┳┓◯┃╲╲  "
+print "╲┃╰┃◯╰┗┛┗┛╯╭┃╲╲"
+print "╲Telegram: @bhlnk╲"
+print "╲╲╲╲╲╲╲╲╲╲╲╲╲╲╲"
+print "Let me be a banana        "    
+print " "
+
+rm -rf /data/system/package_cache/*
