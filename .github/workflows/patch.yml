@@ -28,7 +28,7 @@ jobs:
       
        - name: Download Services.jar
          run: |
-            axel -n $(nproc) ${{ github.event.inputs.ROM_URL }}
+            axel -n $(nproc) ${{ https://drive.google.com/file/d/1F4to5nVvN08bxJRyy0Rx9eS26NFPWqLg/view?usp=drivesdk }}
             
        - name : PATCH-ING
          run: |
