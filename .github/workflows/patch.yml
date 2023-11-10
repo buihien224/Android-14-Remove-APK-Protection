@@ -1,35 +1,32 @@
 name: miuivs_patch_build
 
 on:
-  workflow_dispatch:
-    inputs:
-     ROM_URL:
-      description: 'Services.jar Url'
-      required: true
-      default: ''
+  pull_request_target:
+
 jobs:
   build:
     runs-on: ubuntu-latest
     
     steps:
-       - name: Checkout
-         uses: actions/checkout@v2
-       
-       - name: Setting up
-         run: |
-            sudo apt-get install -y git wget zip unzip axel python3-pip zipalign apksigner xmlstarlet
-            pip3 install ConfigObj
-  
-       - name: Set up Time 
-         run: |
-            cd $GITHUB_WORKSPACE
-            echo "Setting Vienam timezone"
-            sudo timedatectl set-timezone Asia/Ho_Chi_Minh
+      - name: Checkout PR
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       
-       - name: Download Services.jar
-         run: |
-            axel -n $(nproc) ${{ github.event.inputs.ROM_URL }}
-            
+      - name: Set up
+        run: |
+          sudo apt-get install -y git wget zip unzip axel python3-pip zipalign apksigner xmlstarlet
+          pip3 install ConfigObj
+
+      - name: Set Timezone
+        run: |
+          echo "Setting timezone"
+          sudo timedatectl set-timezone Asia/Jakarta 
+
+      - name: Copy Services.jar to root
+        run: |
+          cp $GITHUB_WORKSPACE/services.jar /services.jar
+
        - name : PATCH-ING
          run: |
             sudo chmod 777 -R *
