@@ -23,15 +23,19 @@ jobs:
           echo "Setting timezone"
           sudo timedatectl set-timezone Asia/Jakarta 
 
-    
       - name: PATCH-ING
         run: |
           sudo chmod 777 -R *
           ./bhlnk.sh
 
-      - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v3.1.1
+      - name: Save Artifact
+        run: |
+          mkdir -p artifacts
+          cp -r ./module/* artifacts/
+          
+      - name: Upload Artifact to PR
+        uses: actions/upload-artifact@v3
         with:
           name: services_patched_bhlnk.zip
-          path: ./module/*
+          path: artifacts/
           
