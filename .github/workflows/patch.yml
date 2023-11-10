@@ -23,10 +23,7 @@ jobs:
           echo "Setting timezone"
           sudo timedatectl set-timezone Asia/Jakarta 
 
-      - name: Copy Services.jar to root
-        run: |
-          cp $GITHUB_WORKSPACE/services.jar /services.jar
-
+    
       - name: PATCH-ING
         run: |
           sudo chmod 777 -R *
