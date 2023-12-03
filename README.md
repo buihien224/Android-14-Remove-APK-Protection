@@ -1,6 +1,6 @@
-# android13_remove_apk_protection
-This Patch make Android 13 allow install modded system apk
+#Android-14-Remove-APK-Protection
+This Patch make Android 14 allow install modded system apk
 
-use github action to patch, put your services.jar direct link into input fiels then RUN
+use github action to patch, put your services.jar and framework.jar direct link into input fiels then RUN
 
-https://github.com/buihien224/android13_remove_apk_protection/actions
+https://github.com/buihien224/Android-14-Remove-APK-Protection/actions
