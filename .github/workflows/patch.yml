@@ -3,8 +3,12 @@ name: miuivs_patch_build
 on:
   workflow_dispatch:
     inputs:
-     ROM_URL:
+     S:
       description: 'Services.jar Url'
+      required: true
+      default: ''
+     F:
+      description: 'Framework.jar Url'
       required: true
       default: ''
 jobs:
@@ -28,7 +32,11 @@ jobs:
       
        - name: Download Services.jar
          run: |
-            axel -n $(nproc) ${{ github.event.inputs.ROM_URL }}
+            axel -n $(nproc) ${{ github.event.inputs.S }}
+
+       - name: Download Framework.jar
+         run: |
+            axel -n $(nproc) ${{ github.event.inputs.F }}
             
        - name : PATCH-ING
          run: |
