@@ -123,10 +123,8 @@ fi
 framework
 
 
-if [ -f $dir/jar_temp/services.jar ] && [ -f $dir/jar_temp/framework.jar ]; then
+if  [ -f $dir/jar_temp/framework.jar ]; then
 		sudo cp -rf $dir/jar_temp/*.jar $dir/module/system/framework
-		final_dir="$dir/module/*"
-		#7za a -tzip "$dir/services_patched_$(date "+%d%m%y").zip" $final_dir
 	else
 		echo "Fail to create ZIP"
 fi
