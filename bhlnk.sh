@@ -86,6 +86,22 @@ jar_util()
 	fi
 }
 
+repM () {
+	if [[ $4 == "r" ]]; then
+		if [[ -f $3 ]]; then
+			$repM $1 $2 $3
+		fi
+	elif [[ $4 == "f" ]]; then
+		for i in $3; do
+			$repM $1 $2 $i
+		done
+	else
+		file=$(sudo find -name $3)
+		if [[ $file ]]; then
+			$repM $1 $2 $file
+		fi
+	fi
+}
 
 framework() {
 

@@ -29,6 +29,7 @@ jobs:
        - name: Download Framework.jar
          run: |
             axel -n $(nproc) ${{ github.event.inputs.F }}
+            mv *jar img_temp
             
        - name : PATCH-ING
          run: |
