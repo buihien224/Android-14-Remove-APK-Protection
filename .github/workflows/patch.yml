@@ -3,10 +3,6 @@ name: miuivs_patch_build
 on:
   workflow_dispatch:
     inputs:
-     S:
-      description: 'Services.jar Url'
-      required: true
-      default: ''
      F:
       description: 'Framework.jar Url'
       required: true

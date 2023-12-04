@@ -2,6 +2,20 @@
 dir=$(pwd)
 repM="python3 $dir/bin/strRep.py"
 
+get_file_dir() {
+	if [[ $1 ]]; then
+		if [[ $2 == "auto" ]]; then
+			sudo find $dir/img_temp/ -name $1 
+		elif [[ $2 ]]; then
+			sudo find $dir/$2/ -name $1 | head -1
+		else
+			sudo find $dir/img_temp/ -name $1 | head -1
+		fi
+	else 
+		return 0
+	fi
+}
+
 jar_util() 
 {
 	cd $dir
@@ -72,19 +86,6 @@ jar_util()
 	fi
 }
 
-services() {
-	
-	jar_util d "services.jar" fw
-
-	#repM isSecureLocked false WindowState.smali
-	#repM onPostNotification void AlertWindowNotification.smali
-
-	repM 'isPlatformSigned' true 'PackageManagerService$PackageManagerInternalImpl.smali'
-	repM 'isSignedWithPlatformKey' true 'PackageImpl.smali'
-		
-	jar_util a "services.jar" fw
-}
-
 
 framework() {
 
@@ -111,7 +112,6 @@ if [[ ! -d $dir/jar_temp ]]; then
 	
 fi
 
-services
 framework
 
 
