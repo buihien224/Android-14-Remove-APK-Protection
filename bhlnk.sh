@@ -12,20 +12,14 @@ get_file_dir() {
 
 jar_util() 
 {
-	cd $dir
 
 	if [[ ! -d $dir/jar_temp ]]; then
 		mkdir $dir/jar_temp
 	fi
 
 	#binary
-	if [[ $3 == "fw" ]]; then 
-		bak="java -jar $dir/bin/baksmali.jar d"
-		sma="java -jar $dir/bin/smali.jar a"
-	else
-		bak="java -jar $dir/bin/baksmali-2.5.2.jar d"
-		sma="java -jar $dir/bin/smali-2.5.2.jar a"
-	fi
+	bak="java -jar $dir/bin/baksmali.jar d"
+	sma="java -jar $dir/bin/smali.jar a"
 
 	if [[ $1 == "d" ]]; then
 		echo -ne "====> Patching $2 : "
@@ -39,7 +33,7 @@ jar_util()
 				for dex in $(sudo find $dir/jar_temp/"$2.out" -maxdepth 1 -name "*dex" ); do
 						if [[ $4 ]]; then
 							if [[ "$dex" != *"$4"* && "$dex" != *"$5"* ]]; then
-								echo $dex
+								echo test
 								$bak $dex -o "$dex.out"
 								[[ -d "$dex.out" ]] && rm -rf $dex
 							fi
@@ -100,17 +94,12 @@ repM () {
 }
 
 framework() {
-	if [[ $os -eq 12 ]]; then
-		exrp=3
-	else 
-		exrp=4
-	fi
 
-	jar_util d 'framework.jar' fw $exrp 5
+	jar_util d 'framework.jar' fw classes4 classes5
 
 	repM 'getMinimumSignatureSchemeVersionForTargetSdk' true ApkSignatureVerifier.smali
 	
-	jar_util a 'framework.jar' fw $exrp 5
+	jar_util a 'framework.jar' fw classes4 classes5
 }
 
 services() {
