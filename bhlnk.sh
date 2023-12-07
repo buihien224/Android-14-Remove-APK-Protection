@@ -111,7 +111,15 @@ framework() {
 	jar_util a 'framework.jar' fw $exrp 5
 }
 
+services() {
+	
+	jar_util d "services.jar" fw
 
+	repM 'isPlatformSigned' true 'PackageManagerService$PackageManagerInternalImpl.smali'
+	repM 'isSignedWithPlatformKey' true 'PackageImpl.smali'
+		
+	jar_util a "services.jar" fw
+}
 
 
 if [[ ! -d $dir/jar_temp ]]; then
@@ -121,10 +129,16 @@ if [[ ! -d $dir/jar_temp ]]; then
 fi
 
 framework
-
+services
 
 if  [ -f $dir/jar_temp/framework.jar ]; then
 		sudo cp -rf $dir/jar_temp/*.jar $dir/module/system/framework
 	else
-		echo "Fail to create ZIP"
+		echo "Fail to copy framework"
+fi
+
+if  [ -f $dir/jar_temp/services.jar ]; then
+		sudo cp -rf $dir/jar_temp/*.jar $dir/module/system/framework
+	else
+		echo "Fail to copy services"
 fi
