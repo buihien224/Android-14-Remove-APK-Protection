@@ -29,13 +29,14 @@ jar_util()
 
 	if [[ $1 == "d" ]]; then
 		echo -ne "====> Patching $2 : "
-		ls
+		ls -la
+		ls $dir/jar_temp
 		echo $(get_file_dir $2 )
 
 		if [[ $(get_file_dir $2 ) ]]; then
-			sudo cp $(get_file_dir $2 ) $dir/jar_temp
+			sudo mv $(get_file_dir $2 ) $dir/jar_temp
 			sudo chown $(whoami) $dir/jar_temp/$2
-			unzip $dir/jar_temp/$2 -d $dir/jar_temp/$2.out  >/dev/null 2>&1
+			unzip $dir/jar_temp/$2 -d $dir/jar_temp/$2.out 
 			if [[ -d $dir/jar_temp/"$2.out" ]]; then
 				rm -rf $dir/jar_temp/$2
 				for dex in $(sudo find $dir/jar_temp/"$2.out" -maxdepth 1 -name "*dex" ); do
