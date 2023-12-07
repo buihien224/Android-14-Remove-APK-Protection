@@ -30,7 +30,7 @@ jar_util()
 	if [[ $1 == "d" ]]; then
 		echo -ne "====> Patching $2 : "
 		ls
-		echo $(get_file_dir $2 
+		echo $(get_file_dir $2 )
 
 		if [[ $(get_file_dir $2 ) ]]; then
 			sudo cp $(get_file_dir $2 ) $dir/jar_temp
