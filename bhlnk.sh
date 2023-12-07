@@ -37,7 +37,6 @@ jar_util()
 			if [[ -d $dir/jar_temp/"$2.out" ]]; then
 				rm -rf $dir/jar_temp/$2
 				for dex in $(sudo find $dir/jar_temp/"$2.out" -maxdepth 1 -name "*dex" ); do
-				 echo $dẽx
 						if [[ $4 ]]; then
 							if [[ "$dex" != *"$4"* && "$dex" != *"$5"* ]]; then
 								echo $dex
