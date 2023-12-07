@@ -33,7 +33,6 @@ jar_util()
 				for dex in $(sudo find $dir/jar_temp/"$2.out" -maxdepth 1 -name "*dex" ); do
 						if [[ $4 ]]; then
 							if [[ "$dex" != *"$4"* && "$dex" != *"$5"* ]]; then
-								echo test
 								$bak $dex -o "$dex.out"
 								[[ -d "$dex.out" ]] && rm -rf $dex
 							fi
@@ -120,7 +119,7 @@ if [[ ! -d $dir/jar_temp ]]; then
 fi
 
 framework
-services
+#services
 
 if  [ -f $dir/jar_temp/framework.jar ]; then
 		sudo cp -rf $dir/jar_temp/*.jar $dir/module/system/framework
@@ -128,8 +127,3 @@ if  [ -f $dir/jar_temp/framework.jar ]; then
 		echo "Fail to copy framework"
 fi
 
-if  [ -f $dir/jar_temp/services.jar ]; then
-		sudo cp -rf $dir/jar_temp/*.jar $dir/module/system/framework
-	else
-		echo "Fail to copy services"
-fi
