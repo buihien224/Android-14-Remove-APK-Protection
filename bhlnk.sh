@@ -29,19 +29,18 @@ jar_util()
 
 	if [[ $1 == "d" ]]; then
 		echo -ne "====> Patching $2 : "
-		ls -la
-		ls $dir/jar_temp
-		echo $(get_file_dir $2 )
 
 		if [[ $(get_file_dir $2 ) ]]; then
 			sudo mv $(get_file_dir $2 ) $dir/jar_temp
 			sudo chown $(whoami) $dir/jar_temp/$2
-			unzip $dir/jar_temp/$2 -d $dir/jar_temp/$2.out 
+			unzip $dir/jar_temp/$2 -d $dir/jar_temp/$2.out  >/dev/null 2>&1
 			if [[ -d $dir/jar_temp/"$2.out" ]]; then
 				rm -rf $dir/jar_temp/$2
 				for dex in $(sudo find $dir/jar_temp/"$2.out" -maxdepth 1 -name "*dex" ); do
+				 echo $dẽx
 						if [[ $4 ]]; then
 							if [[ "$dex" != *"$4"* && "$dex" != *"$5"* ]]; then
+								echo $dex
 								$bak $dex -o "$dex.out"
 								[[ -d "$dex.out" ]] && rm -rf $dex
 							fi
@@ -74,7 +73,7 @@ jar_util()
 				zipalign -p -v 4 $dir/jar_temp/$2_notal $dir/jar_temp/$2 >/dev/null 2>&1
 				if [[ -f $dir/jar_temp/$2 ]]; then
 					rm -rf $dir/jar_temp/$2.out $dir/jar_temp/$2_notal 
-					sudo cp -rf $dir/jar_temp/$2 $(get_file_dir $2) 
+					#sudo cp -rf $dir/jar_temp/$2 $(get_file_dir $2) 
 					echo "Succes"
 				else
 					echo "Fail"
