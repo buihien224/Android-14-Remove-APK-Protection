@@ -8,7 +8,7 @@ on:
       required: true
       default: ''
      S:
-      description: 'Framework.jar Url'
+      description: 'Services.jar Url'
       required: true
       default: ''
 jobs:
