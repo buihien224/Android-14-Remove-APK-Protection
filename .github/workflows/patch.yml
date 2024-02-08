@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
      F:
-      description: 'Framework.jar Url'
+      description: 'https://dl.tgxhub.workers.dev/dl/1001712123362/70745?hash=AgADTw'
       required: true
       default: ''
 
