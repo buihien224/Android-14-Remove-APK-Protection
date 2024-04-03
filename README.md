@@ -7,5 +7,3 @@ https://github.com/buihien224/Android-14-Remove-APK-Protection/actions
 
 
 This project is free for everyone, just give credit when using it.
-
-Especially MIUITN or Thắng Nguyễn are absolutely not allowed to be used. This project is only for those who appreciate, not for those who steal intellectual property.
