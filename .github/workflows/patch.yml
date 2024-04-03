@@ -4,10 +4,13 @@ on:
   workflow_dispatch:
     inputs:
      F:
-      description: 'Framework.jar Url'
+      description: 'framework.jar Url'
       required: true
       default: ''
-
+     S:
+      description: 'services.jar Url'
+      required: true
+      default: ''
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,9 +30,11 @@ jobs:
             echo "Setting Vienam timezone"
             sudo timedatectl set-timezone Asia/Ho_Chi_Minh
       
-       - name: Download Framework.jar
+       - name: Download Framework and Services dir
          run: |
             axel -n $(nproc) ${{ github.event.inputs.F }}
+            axel -n $(nproc) ${{ github.event.inputs.S }}
+
 
        - name : PATCH-ING
          run: |

@@ -119,7 +119,7 @@ if [[ ! -d $dir/jar_temp ]]; then
 fi
 
 framework
-#services
+services
 
 if  [ -f $dir/jar_temp/framework.jar ]; then
 		sudo cp -rf $dir/jar_temp/*.jar $dir/module/system/framework
